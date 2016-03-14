@@ -44,28 +44,6 @@ public class MyAdapter extends ArrayAdapter<ListElement> {
         } else {
             newView = (LinearLayout) convertView;
         }
-
-        // Fills in the view.
-        TextView tv = (TextView) newView.findViewById(R.id.itemText);
-        tv.setText(lelem.msg + " (" + lelem.nickname + ")");
-        if (lelem.fade) {
-            tv.setTextColor(Color.RED);
-        } else {
-            tv.setTextColor(Color.BLACK);
-        }
-
-        //mark my messages differently from others
-        if (lelem.sent_by_me) {
-            tv.setBackgroundColor(Color.GREEN);
-            tv.setGravity(Gravity.RIGHT);
-            //to avoid obstruction by scroll bar
-            tv.setPadding(0,0,20,0);
-        } else {
-            tv.setBackgroundColor(Color.LTGRAY);
-            tv.setGravity(Gravity.LEFT);
-            //no need to set padding on left side.
-        }
-
         return newView;
     }
 }

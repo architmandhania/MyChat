@@ -8,6 +8,6 @@ public class PostResult {
 
     @SerializedName("result")
     @Expose
-    public String result;
+    public Integer result;
 
 }

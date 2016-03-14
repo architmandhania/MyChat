@@ -9,20 +9,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.shobhit.mychat.response.GetMessageResponse;
-import com.example.shobhit.mychat.response.ChatDetails;
+import com.example.shobhit.mychat.response.ResponseList;
+import com.example.shobhit.mychat.response.MessageDetails;
 import com.example.shobhit.mychat.response.PostResult;
+import com.example.shobhit.mychat.response.TestResults;
+
+import junit.framework.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.sql.Timestamp;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -68,55 +68,32 @@ public class ChatActivity extends AppCompatActivity {
 				.build();
 
 		Retrofit retrofit = new Retrofit.Builder()
-				.baseUrl("https://luca-teaching.appspot.com/localmessages/default/")
+				.baseUrl("https://3-dot-what-did-i-eat.appspot.com/backend/api/")
 				.addConverterFactory(GsonConverterFactory.create())	//parse Gson string
 				.client(httpClient)	//add logging
 				.build();
 
-        GetService service = retrofit.create(GetService.class);
+        GetInfo service = retrofit.create(GetInfo.class);
 
 		//convert latitude and longitude into acceptable format
 
-        Call<GetMessageResponse> queryResponseCall =
-				service.getChat(getMyLatitude(), getMyLongitude(), getMyId());
+        Call<ResponseList> queryResponseCall =
+				service.getEntry(getNickname());
 
 		//Call retrofit asynchronously
-		queryResponseCall.enqueue(new Callback<GetMessageResponse>() {
+		queryResponseCall.enqueue(new Callback <ResponseList>() {
             @Override
-            public void onResponse(Response<GetMessageResponse> response) {
-                List<ChatDetails> messageList = response.body().resultList;
+            public void onResponse(Response<ResponseList> response) {
+               List<MessageDetails> messageList = response.body().resultList;
                 aList.clear();
                 ListElement lelem;
                 int size = messageList.size();
                 for (int i = 0; i < size; i++) {
                     lelem = new ListElement(messageList.get(i).timestamp,
-                            messageList.get(i).message,
+                            messageList.get(i).comments,
                             messageList.get(i).nickname,
-                            messageList.get(i).userId,
-                            messageList.get(i).messageId);
-                    lelem.fade = false;
-                    lelem.sent_by_me = (messageList.get(i).userId.compareTo(getMyId()) == 0);
-                    aList.add(lelem);
+                            messageList.get(i).restaurant_name);
                 }
-                Collections.reverse(aList);
-
-                // The following code could be tweaked to sort the messages as
-                // per their Timestamps, however, since they are returned in
-                // the sorted order already, no additional sorting is needed.
-                //sort aList based on timestamps
-
-                /*
-                Collections.sort(aList, new Comparator<ListElement>() {
-
-                    public int compare(ListElement s1, ListElement s2) {
-                        Timestamp t1, t2;
-                        t1 = Timestamp.valueOf(s1.timestamp);
-                        t2 = Timestamp.valueOf(s2.timestamp);
-                        return t1.compareTo(t2);
-                    }
-
-                });
-                */
 
                 // We notify the ArrayList adapter that the underlying list has changed,
                 // triggering a re-rendering of the list.
@@ -140,18 +117,14 @@ public class ChatActivity extends AppCompatActivity {
             //nothing to send
             return;
         }
+        String comments = "This is a test comment";
+        String restaurant_name = "Cicero's Pizza";
         float latitude = getMyLatitude();
         float longitude = getMyLongitude();
         String myOwnId = getMyId();
         final String nickname = getNickname();
         final String msg_id = getRandomMessageId();
         String timestamp = getCurrentTimestamp();
-        ListElement latestMessage = new ListElement(timestamp, msg, nickname, myOwnId, msg_id);
-        latestMessage.fade = true; //draw this message in the list differently
-        latestMessage.sent_by_me = true;
-
-        aList.add(latestMessage);
-        aa.notifyDataSetChanged();
 
         //send the message
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -162,35 +135,21 @@ public class ChatActivity extends AppCompatActivity {
 				.build();
 
 		Retrofit retrofit = new Retrofit.Builder()
-				.baseUrl("https://luca-teaching.appspot.com/localmessages/default/")
+				.baseUrl("https://3-dot-what-did-i-eat.appspot.com/backend/api/")
 				.addConverterFactory(GsonConverterFactory.create())	//parse Gson string
 				.client(httpClient)	//add logging
 				.build();
 
-		PostService service = retrofit.create(PostService.class);
+        SendInfo service = retrofit.create(SendInfo.class);
 
 		Call<PostResult> queryResponseCall =
-				service.postChat(latitude, longitude, myOwnId, nickname, msg, msg_id);
+				service.sendEntry(nickname, comments, restaurant_name);
 
-		//Call retrofit asynchronously
+        //Call retrofit asynchronously
 		queryResponseCall.enqueue(new Callback<PostResult>() {
 			@Override
 			public void onResponse(Response<PostResult> response) {
-				String result = response.body().result;
-
-                //the latestMessage was posted. Now updated the rendering of that message
-                //by finding it using the message id
-                for (int i = 0; i < aList.size(); i++) {
-                    if (aList.get(i).msg_id.compareTo(msg_id) == 0) {
-                        //found the message that was sent. Change the fading effect on that message
-                        Log.i(MainActivity.LOG_TAG, "Found last message with id: " + msg_id);
-                        aList.get(i).fade = false;
-                        break;
-                    }
-                }
-				// We notify the ArrayList adapter that the underlying list has changed,
-				// triggering a re-rendering of the list.
-                aa.notifyDataSetChanged();
+                //process the error condition here.
 			}
 
 			@Override
@@ -254,20 +213,18 @@ public class ChatActivity extends AppCompatActivity {
         return timeStamp;
     }
 
-	public interface PostService {
-		@GET("post_message")
-		Call<PostResult> postChat(@Query("lat") float latitude,
-                                  @Query("lng") float longitude,
-                                  @Query("user_id") String user_Id,
+	public interface SendInfo {
+		@GET("store_ui")
+		Call<PostResult> sendEntry(
                                   @Query("nickname") String nickname,
-                                  @Query("message") String message,
-                                  @Query("message_id") String m_id);
+                                  @Query("comments") String comments,
+                                  @Query("restaurant_name") String restaurant_name);
 	}
 
-	public interface GetService {
-		@GET("get_messages")
-		Call<GetMessageResponse> getChat(@Query("lat") float latitude,
-									    @Query("lng") float longitude,
-									    @Query("user_id") String user_Id);
+	public interface GetInfo {
+		@GET("read_ui")
+		Call<ResponseList> getEntry(
+                                         @Query("nickname") String nickname
+                                         );
 	}
 }

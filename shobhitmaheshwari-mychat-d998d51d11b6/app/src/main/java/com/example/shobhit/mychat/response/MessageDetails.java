@@ -1,26 +1,28 @@
 package com.example.shobhit.mychat.response;
 
-//import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-//@Generated("org.jsonschema2pojo")
-public class ChatDetails {
+/**
+ * Created by Archit on 3/13/16.
+ */
+public class MessageDetails {
 
     @SerializedName("timestamp")
     @Expose
     public String timestamp;
-    @SerializedName("message")
+    @SerializedName("comments")
     @Expose
-    public String message;
+    public String comments;
+    @SerializedName("restaurant_name")
+    @Expose
+    public String restaurant_name;
     @SerializedName("nickname")
     @Expose
     public String nickname;
-    @SerializedName("user_id")
+    @SerializedName("id")
     @Expose
-    public String userId;
-    @SerializedName("message_id")
-    @Expose
-    public String messageId;
+    public int result_id;
 
-}
+    }
+

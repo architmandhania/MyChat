@@ -6,21 +6,16 @@ package com.example.shobhit.mychat;
 public class ListElement {
     ListElement() {};
 
-    ListElement(String v_timestamp, String v_msg, String v_nickname, String v_user_id, String v_msg_id) {
+    ListElement(String v_timestamp, String v_comments, String v_nickname, String v_restaurant_name) {
         timestamp = v_timestamp;
-        msg = v_msg;
+        comments = v_comments;
         nickname = v_nickname;
-        user_id = v_user_id;
-        msg_id = v_msg_id;
-        fade = false;
-        sent_by_me = false;
+        restaurant_name = v_restaurant_name;
     }
 
+
     public String timestamp;
-    public String msg;
+    public String comments;
     public String nickname;
-    public String user_id;
-    public String msg_id;
-    public boolean fade;
-    public boolean sent_by_me;
+    public String restaurant_name;
 }
