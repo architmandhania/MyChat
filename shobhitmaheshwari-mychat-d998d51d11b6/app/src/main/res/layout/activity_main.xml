@@ -9,32 +9,110 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.shobhit.mychat.MainActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/v_address"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text=""
+        android:visibility="invisible"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Enter a Nickname:"
-        android:id="@+id/textView"
-        android:layout_above="@+id/editText"
+        android:id="@+id/v_city"
+        android:layout_below="@+id/v_address"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="85dp" />
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/v_state"
+        android:layout_below="@+id/v_city"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/v_country"
+        android:layout_below="@+id/v_state"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/v_postal_code"
+        android:layout_below="@+id/v_country"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:visibility="visible"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/v_name"
+        android:layout_below="@+id/v_postal_code"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible"/>
+
+    <EditText
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editName"
+        android:layout_above="@+id/editText"
+        android:hint="Location Name"
+        android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/editText"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-         />
+        android:hint="Your Name"
+        android:layout_above="@+id/startChat"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Chat"
+        android:text="Check in"
         android:id="@+id/startChat"
-        android:layout_marginTop="51dp"
-        android:layout_below="@+id/editText"
-        android:layout_centerHorizontal="true"
-        android:onClick="beginChat"/>
+        android:onClick="checkIn"
+        android:layout_above="@+id/getlocation"
+        android:layout_toStartOf="@+id/getlocation"
+        android:layout_toLeftOf="@+id/getlocation" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restart"
+        android:id="@+id/restart"
+        android:onClick="restartApp"
+        android:layout_above="@+id/getlocation"
+        android:layout_toStartOf="@+id/getlocation"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Location"
+        android:id="@+id/getlocation"
+        android:onClick="getLocation"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

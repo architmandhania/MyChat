@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,8 +19,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,9 +31,17 @@ public class MainActivity extends AppCompatActivity {
 	public static String LOG_TAG = "MyChat ";
     public static final String myUserIdKey = "myUserId";
     public static final String myNickname = "myNickname";
+	public static final String myRestaurant = "myRestaurant";
 	private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1;
     private static boolean precise_location_found = false;
     public static Location myLocation;
+
+	String addressline = "";
+	String city = "";
+	String state = "";
+	String country = "";
+	String postalCode = "";
+	String knownName = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +59,54 @@ public class MainActivity extends AppCompatActivity {
 		manageChatButton();
 
 		super.onResume();
+	}
+
+	public void getaddress(double latitude, double longitude) {
+		Geocoder geocoder;
+		List<Address> addresses;
+		geocoder = new Geocoder(this, Locale.getDefault());
+		try {
+			addresses = geocoder.getFromLocation(latitude, longitude, 1);
+			addressline = addresses.get(0).getAddressLine(0);
+			city = addresses.get(0).getLocality();
+			state = addresses.get(0).getAdminArea();
+			country = addresses.get(0).getCountryName();
+			postalCode = addresses.get(0).getPostalCode();
+			knownName = addresses.get(0).getFeatureName();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void getLocation(View v) {
+		double lat = myLocation.getLatitude();
+		double longi = myLocation.getLongitude();
+		getaddress(lat, longi);
+
+		TextView tmp = (TextView) findViewById(R.id.v_address);
+		tmp.setText("Address: " + addressline);
+		tmp.setVisibility(View.VISIBLE);
+
+		tmp = (TextView) findViewById(R.id.v_city);
+		tmp.setText("City: " + city);
+		tmp.setVisibility(View.VISIBLE);
+
+		tmp = (TextView) findViewById(R.id.v_state);
+		tmp.setText("State: " + state);
+		tmp.setVisibility(View.VISIBLE);
+
+		tmp = (TextView) findViewById(R.id.v_country);
+		tmp.setText("Country: " + country);
+		tmp.setVisibility(View.VISIBLE);
+
+		tmp = (TextView) findViewById(R.id.v_postal_code);
+		tmp.setText("Zipcode: " + postalCode);
+		tmp.setVisibility(View.VISIBLE);
+
+		tmp = (TextView) findViewById(R.id.v_name);
+		tmp.setText("Name: " + knownName);
+		tmp.setVisibility(View.VISIBLE);
 	}
 
 	/*
@@ -214,10 +275,25 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "Saved in Preferences " + myNickname + " as: " + nickname);
     }
 
-	public void beginChat(View v) {
+	private void saveRestaurant() {
+		String restaurant = ((EditText) findViewById(R.id.editName)).getText().toString();
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(myRestaurant, restaurant);
+		editor.commit();
+	}
+
+	public void checkIn(View v) {
         saveNickname();
+		saveRestaurant();
 		Intent intent = new Intent(this, ChatActivity.class);
 		startActivity(intent);
+	}
+
+	public void restartApp(View v) {
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
+		//finish();
 	}
 
     private void dumpLocation() {

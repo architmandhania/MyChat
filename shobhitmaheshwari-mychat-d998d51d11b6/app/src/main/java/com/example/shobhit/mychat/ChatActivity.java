@@ -2,6 +2,8 @@ package com.example.shobhit.mychat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.shobhit.mychat.response.ResponseList;
 import com.example.shobhit.mychat.response.MessageDetails;
@@ -22,7 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -51,16 +56,15 @@ public class ChatActivity extends AppCompatActivity {
 
 		aList = new ArrayList<ListElement>();
 		aa = new MyAdapter(this, R.layout.list_element, aList);
-		ListView myListView = (ListView) findViewById(R.id.listView);
-		myListView.setAdapter(aa);
+		//ListView myListView = (ListView) findViewById(R.id.listView);
+		//myListView.setAdapter(aa);
 		aa.notifyDataSetChanged();
 
 		super.onResume();
 	}
 
 	public void getMessages(View v) {
-
-		HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 		// set your desired log level
 		logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 		OkHttpClient httpClient = new OkHttpClient.Builder()
@@ -77,14 +81,15 @@ public class ChatActivity extends AppCompatActivity {
 
 		//convert latitude and longitude into acceptable format
 
-        Call<ResponseList> queryResponseCall =
-				service.getEntry(getNickname());
+        Call<ResponseList> queryResponseCall = service.getEntry(getNickname());
 
-		//Call retrofit asynchronously
-		queryResponseCall.enqueue(new Callback <ResponseList>() {
+        fillEntry();
+        //Call retrofit asynchronously
+		queryResponseCall.enqueue(new Callback<ResponseList>() {
             @Override
             public void onResponse(Response<ResponseList> response) {
-               List<MessageDetails> messageList = response.body().resultList;
+                List<MessageDetails> messageList = response.body().resultList;
+                /*
                 aList.clear();
                 ListElement lelem;
                 int size = messageList.size();
@@ -98,6 +103,20 @@ public class ChatActivity extends AppCompatActivity {
                 // We notify the ArrayList adapter that the underlying list has changed,
                 // triggering a re-rendering of the list.
                 aa.notifyDataSetChanged();
+                */
+                /*
+                TextView tmp = (TextView) findViewById(R.id.v_nickname);
+                tmp.setText("Nickname: " + messageList.get(0).nickname);
+                tmp.setVisibility(View.VISIBLE);
+
+                tmp = (TextView) findViewById(R.id.v_place);
+                tmp.setText("Place: " + messageList.get(0).restaurant_name);
+                tmp.setVisibility(View.VISIBLE);
+
+                tmp = (TextView) findViewById(R.id.v_comment);
+                tmp.setText("Comment: " + messageList.get(0).comments);
+                tmp.setVisibility(View.VISIBLE);
+                */
             }
 
             @Override
@@ -117,8 +136,8 @@ public class ChatActivity extends AppCompatActivity {
             //nothing to send
             return;
         }
-        String comments = "This is a test comment";
-        String restaurant_name = "Cicero's Pizza";
+        String comments = msg;
+        String restaurant_name = getRestaurant();
         float latitude = getMyLatitude();
         float longitude = getMyLongitude();
         String myOwnId = getMyId();
@@ -160,6 +179,20 @@ public class ChatActivity extends AppCompatActivity {
 		});
 	}
 
+    public void fillEntry(){
+        TextView tmp = (TextView) findViewById(R.id.v_nickname);
+        tmp.setText("Nickname: Khoa");
+        tmp.setVisibility(View.VISIBLE);
+
+        tmp = (TextView) findViewById(R.id.v_place);
+        tmp.setText("Place: UCSC");
+        tmp.setVisibility(View.VISIBLE);
+
+        tmp = (TextView) findViewById(R.id.v_comment);
+        tmp.setText("Comment: This place is really cool!");
+        tmp.setVisibility(View.VISIBLE);
+    }
+
     private float getMyLatitude() {
         double latitude;
         try {
@@ -194,6 +227,11 @@ public class ChatActivity extends AppCompatActivity {
         return settings.getString(MainActivity.myNickname, "nickname");
     }
 
+    private String getRestaurant() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        return settings.getString(MainActivity.myRestaurant, "restaurant");
+    }
+
     private String getMessageToPost() {
         String message = ((EditText) findViewById(R.id.msgText)).getText().toString().trim();
 
@@ -213,18 +251,21 @@ public class ChatActivity extends AppCompatActivity {
         return timeStamp;
     }
 
+    public void restart(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        //finish();
+    }
+
 	public interface SendInfo {
 		@GET("store_ui")
-		Call<PostResult> sendEntry(
-                                  @Query("nickname") String nickname,
+		Call<PostResult> sendEntry(@Query("nickname") String nickname,
                                   @Query("comments") String comments,
                                   @Query("restaurant_name") String restaurant_name);
 	}
 
 	public interface GetInfo {
 		@GET("read_ui")
-		Call<ResponseList> getEntry(
-                                         @Query("nickname") String nickname
-                                         );
+		Call<ResponseList> getEntry(@Query("nickname") String nickname);
 	}
 }
