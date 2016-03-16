@@ -12,7 +12,7 @@ package com.example.shobhit.mychat.response;
 
         @SerializedName("result_list")
         @Expose
-        public List<MessageDetails> resultList = new ArrayList<MessageDetails>();
+        public List<MessageDetails> result_list = new ArrayList<MessageDetails>();
         @SerializedName("result")
         @Expose
         public String result;

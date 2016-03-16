@@ -40,6 +40,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public class ChatActivity extends AppCompatActivity {
+    public static String LOG_TAG = "MyChat ";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +84,16 @@ public class ChatActivity extends AppCompatActivity {
 
         Call<ResponseList> queryResponseCall = service.getEntry(getNickname());
 
-        fillEntry();
+        //fillEntry();
         //Call retrofit asynchronously
+        Log.i(LOG_TAG,"we are about to enter onResponse");
 		queryResponseCall.enqueue(new Callback<ResponseList>() {
             @Override
             public void onResponse(Response<ResponseList> response) {
-                List<MessageDetails> messageList = response.body().resultList;
-                /*
+                Log.i(LOG_TAG,"we were in on response");
+                List<MessageDetails> messageList = response.body().result_list;
+                Log.i(LOG_TAG,messageList.get(0).comments);
+
                 aList.clear();
                 ListElement lelem;
                 int size = messageList.size();
@@ -103,20 +107,20 @@ public class ChatActivity extends AppCompatActivity {
                 // We notify the ArrayList adapter that the underlying list has changed,
                 // triggering a re-rendering of the list.
                 aa.notifyDataSetChanged();
-                */
-                /*
+
+
                 TextView tmp = (TextView) findViewById(R.id.v_nickname);
                 tmp.setText("Nickname: " + messageList.get(0).nickname);
-                tmp.setVisibility(View.VISIBLE);
+                //tmp.setVisibility(View.VISIBLE);
 
                 tmp = (TextView) findViewById(R.id.v_place);
                 tmp.setText("Place: " + messageList.get(0).restaurant_name);
-                tmp.setVisibility(View.VISIBLE);
+                //tmp.setVisibility(View.VISIBLE);
 
                 tmp = (TextView) findViewById(R.id.v_comment);
                 tmp.setText("Comment: " + messageList.get(0).comments);
-                tmp.setVisibility(View.VISIBLE);
-                */
+                //tmp.setVisibility(View.VISIBLE);
+
             }
 
             @Override
@@ -138,12 +142,7 @@ public class ChatActivity extends AppCompatActivity {
         }
         String comments = msg;
         String restaurant_name = getRestaurant();
-        float latitude = getMyLatitude();
-        float longitude = getMyLongitude();
-        String myOwnId = getMyId();
         final String nickname = getNickname();
-        final String msg_id = getRandomMessageId();
-        String timestamp = getCurrentTimestamp();
 
         //send the message
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -193,35 +192,6 @@ public class ChatActivity extends AppCompatActivity {
         tmp.setVisibility(View.VISIBLE);
     }
 
-    private float getMyLatitude() {
-        double latitude;
-        try {
-            latitude = MainActivity.myLocation.getLatitude();
-        } catch (Exception e) {
-            Log.i(MainActivity.LOG_TAG, "Latitude threw this exception:" + e.toString() +
-                    ". Returning hard coded value");
-            latitude = 9.9993;
-        }
-        return (float)latitude;
-    }
-
-    private float getMyLongitude() {
-        double longitude;
-        try {
-            longitude = MainActivity.myLocation.getLongitude();
-        } catch (Exception e) {
-            Log.i(MainActivity.LOG_TAG, "Longitude threw this exception:" + e.toString() +
-                    ". Returning hard coded value");
-            longitude = 10.0004;
-        }
-        return (float) longitude;
-    }
-
-    private String getMyId() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        return settings.getString(MainActivity.myUserIdKey, "ownid");
-    }
-
     private String getNickname() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         return settings.getString(MainActivity.myNickname, "nickname");
@@ -240,16 +210,6 @@ public class ChatActivity extends AppCompatActivity {
         return message;
     }
 
-    private String getRandomMessageId() {
-        String msg_id = (UUID.randomUUID().toString()).substring(0, 5);
-        return msg_id;
-    }
-
-    private String getCurrentTimestamp() {
-        //may need to change this to match the format of timestamp returned by other messages
-        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-        return timeStamp;
-    }
 
     public void restart(View v) {
         Intent intent = new Intent(this, MainActivity.class);

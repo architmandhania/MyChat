@@ -23,8 +23,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/v_nickname"
-            android:text=""
-            android:visibility="invisible"
+            android:text="testing"
+            android:visibility="visible"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"/>
@@ -34,8 +34,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/v_place"
-            android:text=""
-            android:visibility="invisible"
+            android:text="testing"
+            android:visibility="visible"
             android:layout_marginTop="20dp"
             android:layout_below="@+id/v_nickname"
             android:layout_centerHorizontal="true"
@@ -47,9 +47,9 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/v_comment"
             android:layout_marginTop="80dp"
-            android:text=""
+            android:text="testing"
             android:layout_below="@+id/v_place"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.88" />
 
