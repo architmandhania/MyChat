@@ -8,11 +8,11 @@ package com.example.shobhit.mychat.response;
     import com.google.gson.annotations.Expose;
     import com.google.gson.annotations.SerializedName;
 
-    public class ResponseList {
+    public class GetMessageResponse {
 
         @SerializedName("result_list")
         @Expose
-        public List<MessageDetails> result_list = new ArrayList<MessageDetails>();
+        public List<MessageDetails> resultList = new ArrayList<MessageDetails>();
         @SerializedName("result")
         @Expose
         public String result;

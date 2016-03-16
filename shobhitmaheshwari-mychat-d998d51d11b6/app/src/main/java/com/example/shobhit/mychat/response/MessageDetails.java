@@ -22,7 +22,7 @@ public class MessageDetails {
     public String nickname;
     @SerializedName("id")
     @Expose
-    public int result_id;
+    public long result_id;
 
     }
 

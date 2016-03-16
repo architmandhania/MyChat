@@ -80,8 +80,10 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public void getLocation(View v) {
-		double lat = myLocation.getLatitude();
-		double longi = myLocation.getLongitude();
+		//double lat = myLocation.getLatitude();
+		double lat = 36.99501233;
+		//double longi = myLocation.getLongitude();
+		double longi = -122.05681801;
 		getaddress(lat, longi);
 
 		TextView tmp = (TextView) findViewById(R.id.v_address);

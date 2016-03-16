@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.shobhit.mychat.response.ResponseList;
+import com.example.shobhit.mychat.response.GetMessageResponse;
 import com.example.shobhit.mychat.response.MessageDetails;
 import com.example.shobhit.mychat.response.PostResult;
 import com.example.shobhit.mychat.response.TestResults;
@@ -41,6 +41,8 @@ import retrofit2.http.Query;
 
 public class ChatActivity extends AppCompatActivity {
     public static String LOG_TAG = "MyChat ";
+    private int count = 0;
+    private int list_size = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,41 +69,41 @@ public class ChatActivity extends AppCompatActivity {
 	public void getMessages(View v) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 		// set your desired log level
-		logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+		logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 		OkHttpClient httpClient = new OkHttpClient.Builder()
 				.addInterceptor(logging)
 				.build();
 
 		Retrofit retrofit = new Retrofit.Builder()
-				.baseUrl("https://3-dot-what-did-i-eat.appspot.com/backend/api/")
+                //.baseUrl("https://luca-teaching.appspot.com/localmessages/default/")
+                .baseUrl("https://3-dot-what-did-i-eat.appspot.com/backend/api/")
 				.addConverterFactory(GsonConverterFactory.create())	//parse Gson string
 				.client(httpClient)	//add logging
 				.build();
 
         GetInfo service = retrofit.create(GetInfo.class);
 
-		//convert latitude and longitude into acceptable format
+        Call<GetMessageResponse> queryResponseCall = service.getEntry(getNickname());
 
-        Call<ResponseList> queryResponseCall = service.getEntry(getNickname());
-
-        //fillEntry();
         //Call retrofit asynchronously
-        Log.i(LOG_TAG,"we are about to enter onResponse");
-		queryResponseCall.enqueue(new Callback<ResponseList>() {
+        Log.i(LOG_TAG, "we are about to enqueue onResponse for nickname: " + getNickname());
+		queryResponseCall.enqueue(new Callback<GetMessageResponse>() {
             @Override
-            public void onResponse(Response<ResponseList> response) {
-                Log.i(LOG_TAG,"we were in on response");
-                List<MessageDetails> messageList = response.body().result_list;
-                Log.i(LOG_TAG,messageList.get(0).comments);
+            public void onResponse(Response<GetMessageResponse> response) {
+                Log.i(LOG_TAG, "we were in on response");
+                List<MessageDetails> messageList = response.body().resultList;
+                Log.i(LOG_TAG, messageList.get(0).comments);
 
                 aList.clear();
                 ListElement lelem;
+                list_size = messageList.size();
                 int size = messageList.size();
                 for (int i = 0; i < size; i++) {
                     lelem = new ListElement(messageList.get(i).timestamp,
                             messageList.get(i).comments,
                             messageList.get(i).nickname,
                             messageList.get(i).restaurant_name);
+                    aList.add(lelem);
                 }
 
                 // We notify the ArrayList adapter that the underlying list has changed,
@@ -111,25 +113,45 @@ public class ChatActivity extends AppCompatActivity {
 
                 TextView tmp = (TextView) findViewById(R.id.v_nickname);
                 tmp.setText("Nickname: " + messageList.get(0).nickname);
-                //tmp.setVisibility(View.VISIBLE);
+                tmp.setVisibility(View.VISIBLE);
 
                 tmp = (TextView) findViewById(R.id.v_place);
                 tmp.setText("Place: " + messageList.get(0).restaurant_name);
-                //tmp.setVisibility(View.VISIBLE);
+                tmp.setVisibility(View.VISIBLE);
 
                 tmp = (TextView) findViewById(R.id.v_comment);
                 tmp.setText("Comment: " + messageList.get(0).comments);
-                //tmp.setVisibility(View.VISIBLE);
+                tmp.setVisibility(View.VISIBLE);
+
+                count ++;
 
             }
 
             @Override
             public void onFailure(Throwable t) {
                 // Log error here since request failed
+                Log.i(LOG_TAG, "**** onFailure() called for getInfo. Investigate..*****");
+                Log.i(LOG_TAG, t.getMessage());
             }
 
         });
 	}
+    public void nextReview( View v){
+        if (count < list_size){
+            TextView tmp = (TextView) findViewById(R.id.v_nickname);
+            tmp.setText("Nickname: " + aList.get(count).nickname);
+            tmp.setVisibility(View.VISIBLE);
+
+            tmp = (TextView) findViewById(R.id.v_place);
+            tmp.setText("Place: " + aList.get(count).restaurant_name);
+            tmp.setVisibility(View.VISIBLE);
+
+            tmp = (TextView) findViewById(R.id.v_comment);
+            tmp.setText("Comment: " + aList.get(count).comments);
+            tmp.setVisibility(View.VISIBLE);
+
+        }else return;
+    }
 
 	public void postMessage(View v) {
 
@@ -167,12 +189,14 @@ public class ChatActivity extends AppCompatActivity {
 		queryResponseCall.enqueue(new Callback<PostResult>() {
 			@Override
 			public void onResponse(Response<PostResult> response) {
-                //process the error condition here.
+                Log.i(LOG_TAG, "we were in onResponse for PostResult http call");
 			}
 
 			@Override
 			public void onFailure(Throwable t) {
 				// Log error here since request failed
+                Log.i(LOG_TAG, "**** onFailure() called for PostResult. Investigate..*****");
+                Log.i(LOG_TAG, t.getMessage());
 			}
 
 		});
@@ -226,6 +250,6 @@ public class ChatActivity extends AppCompatActivity {
 
 	public interface GetInfo {
 		@GET("read_ui")
-		Call<ResponseList> getEntry(@Query("nickname") String nickname);
+		Call<GetMessageResponse> getEntry(@Query("nickname") String nickname);
 	}
 }

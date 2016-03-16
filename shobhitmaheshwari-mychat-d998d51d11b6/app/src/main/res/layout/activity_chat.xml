@@ -24,7 +24,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/v_nickname"
             android:text="testing"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"/>
@@ -35,7 +35,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/v_place"
             android:text="testing"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:layout_marginTop="20dp"
             android:layout_below="@+id/v_nickname"
             android:layout_centerHorizontal="true"
@@ -49,7 +49,7 @@
             android:layout_marginTop="80dp"
             android:text="testing"
             android:layout_below="@+id/v_place"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.88" />
 
@@ -60,6 +60,14 @@
             android:text="Post Review"
             android:id="@+id/send"
             android:onClick="postMessage"
+            android:layout_gravity="right" />
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next Review"
+            android:id="@+id/nextReview"
+            android:onClick="nextReview"
             android:layout_gravity="right" />
 
         <Button
